@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  SELLER
+}
+
+enum Category {
+  Electronics
+  Snacks
+  Dairy
+  Beauty
+  Bath
+  Kitchen
+}
+
+model User {
+  id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String
+  email    String    @unique
+  password String
+  role     Role      @default(USER)
+  products Product[]
+}
+
+model Product {
+  id              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String
+  price           Int
+  brand           String
+  description     String
+  category        Category
+  warehouses      Warehouse[]
+  warehouseStocks WarehouseStocks[]
+
+  sellerId String @db.Uuid
+  seller   User   @relation(fields: [sellerId], references: [id] , onDelete: Cascade)
+}
+
+model Warehouse {
+  id              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  city            String
+  name            String
+  products        Product[]
+  warehouseStocks WarehouseStocks[]
+}
+
+model WarehouseStocks {
+  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId   String @db.Uuid
+  warehouseId String @db.Uuid
+
+  product   Product   @relation(fields: [productId], references: [id] , onDelete: Cascade)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id] , onDelete: Cascade)
+
+  quantity Int
+
+  @@unique([productId])
+  @@index([warehouseId])
+}
