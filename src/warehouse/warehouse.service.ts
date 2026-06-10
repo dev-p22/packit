@@ -122,4 +122,26 @@ export class WarehouseService {
       success: true,
     };
   }
+
+  async selectWarehouse(warehouseId: string, userId: string) {
+    // validate
+    const warehouse = await this.prisma.warehouse.findUnique({
+      where: { id: warehouseId },
+    });
+
+    if (!warehouse) {
+      throw new NotFoundException('Warehouse Not Found');
+    }
+    // add to user
+
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: { warehouseId },
+    });
+    // return response
+    return {
+      success: true,
+      user,
+    };
+  }
 }

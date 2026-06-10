@@ -7,12 +7,14 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { WarehouseService } from './warehouse.service';
 import { CreateWarehouseDto } from './dto/create-warehouse.dto';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 import { CreateWarehouseStockDto } from './dto/create-warehouseStock.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import type { AuthRequest } from 'src/common/interfaces/interface';
 
 @Controller('warehouse')
 @UseGuards(JwtAuthGuard)
@@ -55,5 +57,10 @@ export class WarehouseController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.warehouseService.remove(id);
+  }
+
+  @Post('/:id/select')
+  selectWarehouse(@Param('id') id: string, @Req() req: AuthRequest) {
+    return this.warehouseService.selectWarehouse(id, req.user?.userId);
   }
 }

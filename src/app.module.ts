@@ -5,9 +5,10 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { ProductModule } from './product/product.module';
 import { WarehouseModule } from './warehouse/warehouse.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
-  imports: [AuthModule, ConfigModule.forRoot(), ProductModule, WarehouseModule],
+  imports: [AuthModule, ConfigModule.forRoot(), ProductModule, WarehouseModule, CartModule],
   controllers: [AppController],
   providers: [AppService],
 })

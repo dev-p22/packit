@@ -28,12 +28,14 @@ enum Category {
 }
 
 model User {
-  id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name     String
-  email    String    @unique
-  password String
-  role     Role      @default(USER)
-  products Product[]
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  email       String    @unique
+  password    String
+  role        Role      @default(USER)
+  products    Product[]
+  warehouseId String?   @db.Uuid
+  carts       Cart[]
 }
 
 model Product {
@@ -46,8 +48,9 @@ model Product {
   warehouses      Warehouse[]
   warehouseStocks WarehouseStocks[]
 
-  sellerId String @db.Uuid
-  seller   User   @relation(fields: [sellerId], references: [id] , onDelete: Cascade)
+  sellerId  String     @db.Uuid
+  seller    User       @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  userCarts UserCart[]
 }
 
 model Warehouse {
@@ -63,11 +66,31 @@ model WarehouseStocks {
   productId   String @db.Uuid
   warehouseId String @db.Uuid
 
-  product   Product   @relation(fields: [productId], references: [id] , onDelete: Cascade)
-  warehouse Warehouse @relation(fields: [warehouseId], references: [id] , onDelete: Cascade)
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
 
   quantity Int
 
   @@unique([productId])
   @@index([warehouseId])
+}
+
+model Cart {
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String     @unique @db.Uuid
+  warehouseId String     @db.Uuid
+  userCarts   UserCart[]
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserCart {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cartId    String @db.Uuid
+  productId String @db.Uuid
+  quantity  Int
+
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, productId])
 }

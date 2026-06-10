@@ -97,7 +97,9 @@ export class ProductService {
     });
 
     if (existingProduct?.sellerId !== userId) {
-      throw new UnauthorizedException('You are Not Authorize');
+      throw new UnauthorizedException(
+        'You have not permissiong to change this product',
+      );
     }
 
     const product: Product = await this.prisma.product.update({
