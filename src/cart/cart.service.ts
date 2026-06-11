@@ -6,6 +6,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { isUuid } from 'src/common/helpers/isUuid';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -33,6 +34,9 @@ export class CartService {
   }
 
   async addToCart(userId: string, productId: string) {
+    if (!isUuid(productId)) {
+      throw new BadRequestException('ProductId is not Valid');
+    }
     // user selected warehouse
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -163,8 +167,15 @@ export class CartService {
   }
 
   async removeFromCart(productId: string, userId: string, cartId: string) {
-    // find cart & userCart
+    if (!isUuid(productId)) {
+      throw new BadRequestException('ProductId is not Valid');
+    }
 
+    if (!isUuid(cartId)) {
+      throw new BadRequestException('cartId is not Valid');
+    }
+
+    // find cart & userCart
     const cart = await this.prisma.cart.findUnique({
       where: { id: cartId },
     });
@@ -220,6 +231,9 @@ export class CartService {
   }
 
   async removeCart(cartId: string) {
+    if (!isUuid(cartId)) {
+      throw new BadRequestException('cartId is not Valid');
+    }
     await this.prisma.cart.delete({
       where: { id: cartId },
     });

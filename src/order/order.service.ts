@@ -1,10 +1,12 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { PrismaService } from 'src/prisma.service';
+import { isUuid } from 'src/common/helpers/isUuid';
 
 @Injectable()
 export class OrderService {
@@ -14,6 +16,10 @@ export class OrderService {
     warehouseId: string,
     userId: string,
   ) {
+    if (!isUuid(warehouseId)) {
+      throw new BadRequestException('warehouseId is not Valid');
+    }
+
     // add cart products to orderProducts
     const cart = await this.prisma.cart.findUnique({
       where: { userId },
@@ -106,6 +112,9 @@ export class OrderService {
   }
 
   async findOne(orderId: string) {
+    if (!isUuid(orderId)) {
+      throw new BadRequestException('orderId is not Valid');
+    }
     const order = await this.prisma.order.findUnique({
       where: {
         id: orderId,

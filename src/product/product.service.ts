@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotAcceptableException,
   NotFoundException,
@@ -8,6 +9,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma.service';
 import { Product } from 'generated/prisma/client';
+import { isUuid } from 'src/common/helpers/isUuid';
 
 @Injectable()
 export class ProductService {
@@ -65,6 +67,9 @@ export class ProductService {
   }
 
   async findOne(id: string) {
+    if (!isUuid(id)) {
+      throw new BadRequestException('ProductId is not Valid');
+    }
     const product: Product | null = await this.prisma.product.findUnique({
       where: { id },
     });
@@ -135,6 +140,9 @@ export class ProductService {
   }
 
   async remove(id: string, userId: string) {
+    if (!isUuid(id)) {
+      throw new BadRequestException('ProductId is not Valid');
+    }
     const existingProduct = await this.prisma.product.findUnique({
       where: { id },
     });

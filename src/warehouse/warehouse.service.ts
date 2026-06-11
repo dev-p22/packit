@@ -8,6 +8,7 @@ import { CreateWarehouseDto } from './dto/create-warehouse.dto';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 import { PrismaService } from 'src/prisma.service';
 import { CreateWarehouseStockDto } from './dto/create-warehouseStock.dto';
+import { isUuid } from 'src/common/helpers/isUuid';
 
 @Injectable()
 export class WarehouseService {
@@ -31,6 +32,10 @@ export class WarehouseService {
     warehouseId: string,
   ) {
     // validation
+
+    if (!isUuid(warehouseId)) {
+      throw new BadRequestException('warehouseId is not Valid');
+    }
 
     if (createWarehouseStock.quantity < 1) {
       throw new BadRequestException('Quantity must be One or more that One');
@@ -86,6 +91,9 @@ export class WarehouseService {
   }
 
   async getWarehouseProducts(warehouseId: string) {
+    if (!isUuid(warehouseId)) {
+      throw new BadRequestException('warehouseId is not Valid');
+    }
     // find warehousestocks
     const warehouseStocks = await this.prisma.warehouseStocks.findMany({
       where: { warehouseId: warehouseId },
@@ -117,6 +125,9 @@ export class WarehouseService {
   }
 
   async update(id: string, updateWarehouseDto: UpdateWarehouseDto) {
+    if (!isUuid(id)) {
+      throw new BadRequestException('warehouseId is not Valid');
+    }
     // update warehouse
     const warehouse = await this.prisma.warehouse.update({
       where: { id },
@@ -130,6 +141,9 @@ export class WarehouseService {
   }
 
   async remove(id: string) {
+    if (!isUuid(id)) {
+      throw new BadRequestException('warehouseId is not Valid');
+    }
     await this.prisma.warehouse.delete({
       where: { id },
     });
@@ -140,6 +154,9 @@ export class WarehouseService {
   }
 
   async selectWarehouse(warehouseId: string, userId: string) {
+    if (!isUuid(warehouseId)) {
+      throw new BadRequestException('warehouseId is not Valid');
+    }
     // validate
     const warehouse = await this.prisma.warehouse.findUnique({
       where: { id: warehouseId },
