@@ -27,6 +27,11 @@ enum Category {
   Kitchen
 }
 
+enum Payment {
+  Cash
+  Online
+}
+
 model User {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
@@ -36,6 +41,7 @@ model User {
   products    Product[]
   warehouseId String?   @db.Uuid
   carts       Cart[]
+  orders      Order[]
 }
 
 model Product {
@@ -71,7 +77,7 @@ model WarehouseStocks {
 
   quantity Int
 
-  @@unique([productId])
+  @@unique([productId, warehouseId])
   @@index([warehouseId])
 }
 
@@ -93,4 +99,27 @@ model UserCart {
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([cartId, productId])
+}
+
+model Order {
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  payment_type    Payment
+  createdAt       DateTime         @default(now())
+  warehouseId     String           @db.Uuid
+  orderedProducts OrderedProduct[]
+  userId          String           @db.Uuid
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model OrderedProduct {
+  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  price     Int
+  brand     String
+  productId String? @db.Uuid
+  quantity  Int
+
+  orderId String @db.Uuid
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }

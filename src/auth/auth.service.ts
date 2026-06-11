@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { RegisterDto } from 'src/auth/dto/Register.dto';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma.service';
@@ -14,6 +18,13 @@ export class AuthService {
 
   async create(registerData: RegisterDto) {
     // validate
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: registerData.email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('User already Exits');
+    }
     // hash pass
     const hash = await bcrypt.hash(registerData.password, 10);
 

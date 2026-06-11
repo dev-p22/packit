@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateWarehouseDto } from './dto/create-warehouse.dto';
@@ -30,6 +31,7 @@ export class WarehouseService {
     warehouseId: string,
   ) {
     // validation
+
     if (createWarehouseStock.quantity < 1) {
       throw new BadRequestException('Quantity must be One or more that One');
     }
@@ -49,9 +51,19 @@ export class WarehouseService {
     if (!warehouse) {
       throw new NotFoundException('Warehouse Not Found');
     }
+
+    if (createWarehouseStock.quantity > 10000) {
+      throw new NotAcceptableException(
+        'Quantity more than 10000 is not acceptable',
+      );
+    }
+
+    const productId = createWarehouseStock.productId;
     // add into warehouse
-    const warehouseStock = await this.prisma.warehouseStocks.create({
-      data: {
+    const warehouseStock = await this.prisma.warehouseStocks.upsert({
+      where: { productId_warehouseId: { productId, warehouseId } },
+      update: { quantity: { increment: createWarehouseStock.quantity } },
+      create: {
         productId: createWarehouseStock.productId,
         quantity: createWarehouseStock.quantity,
         warehouseId: warehouseId,

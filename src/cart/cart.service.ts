@@ -2,6 +2,8 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotAcceptableException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
@@ -58,6 +60,38 @@ export class CartService {
       );
     }
 
+    const warehouseId = user.warehouseId;
+
+    const warehouseStocks = await this.prisma.warehouseStocks.findUnique({
+      where: { productId_warehouseId: { productId, warehouseId } },
+    });
+
+    // checking if product is in stock for warehouse
+    if (warehouseStocks?.quantity === 0) {
+      throw new BadRequestException(
+        'Product Is Out Of Stock for This Warehouse',
+      );
+    }
+
+    const existingCartProduct = await this.prisma.userCart.findUnique({
+      where: {
+        cartId_productId: {
+          cartId: cart.id,
+          productId,
+        },
+      },
+    });
+
+    if (
+      existingCartProduct?.quantity != null &&
+      warehouseStocks?.quantity != null &&
+      existingCartProduct.quantity >= warehouseStocks.quantity
+    ) {
+      throw new NotAcceptableException(
+        "Product Is out of stock. You Can't Add more Products",
+      );
+    }
+
     // add or update
     const cartProduct = await this.prisma.userCart.upsert({
       where: {
@@ -104,6 +138,12 @@ export class CartService {
         },
       },
     });
+
+    if (!cart) {
+      throw new NotFoundException(
+        "Cart Is Not Avilable Or Cart Doesn't have Any product",
+      );
+    }
 
     // total sum of price
     const cartProductPrices = cart?.userCarts?.map((cartProduct) => {
@@ -177,5 +217,16 @@ export class CartService {
         userProduct,
       };
     }
+  }
+
+  async removeCart(cartId: string) {
+    await this.prisma.cart.delete({
+      where: { id: cartId },
+    });
+
+    return {
+      success: true,
+      message: 'Cart Deleted',
+    };
   }
 }

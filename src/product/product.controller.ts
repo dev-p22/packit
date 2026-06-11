@@ -62,7 +62,7 @@ export class ProductController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productService.remove(id);
+  remove(@Param('id') id: string, @Req() req: AuthRequest) {
+    return this.productService.remove(id, req.user.userId);
   }
 }

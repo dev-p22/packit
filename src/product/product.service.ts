@@ -1,6 +1,7 @@
 import {
-  BadRequestException,
   Injectable,
+  NotAcceptableException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -24,7 +25,11 @@ export class ProductService {
     }
 
     if (createProductDto.price < 5) {
-      throw new BadRequestException('Price must be more than 5');
+      throw new NotAcceptableException('Price must be more than 5');
+    }
+
+    if (createProductDto.price > 10000) {
+      throw new NotAcceptableException('Price Must be Less than 10000');
     }
 
     // create product
@@ -50,6 +55,9 @@ export class ProductService {
 
   async findAll() {
     const products = await this.prisma.product.findMany();
+    if (!products) {
+      throw new NotFoundException('Products Not Found');
+    }
     return {
       success: true,
       products,
@@ -60,6 +68,10 @@ export class ProductService {
     const product: Product | null = await this.prisma.product.findUnique({
       where: { id },
     });
+
+    if (!product) {
+      throw new NotFoundException('Product Not Found');
+    }
     return {
       success: true,
       product,
@@ -74,6 +86,10 @@ export class ProductService {
     const products = await this.prisma.product.findMany({
       where: { sellerId: userId },
     });
+
+    if (!products) {
+      throw new NotFoundException('Products Not Found');
+    }
 
     return {
       success: true,
@@ -97,7 +113,7 @@ export class ProductService {
     });
 
     if (!existingProduct) {
-      throw new BadRequestException("Product Doesn't Exits");
+      throw new NotFoundException("Product Doesn't Exits");
     }
 
     // Product only changed by seller who added it
@@ -118,7 +134,21 @@ export class ProductService {
     };
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId: string) {
+    const existingProduct = await this.prisma.product.findUnique({
+      where: { id },
+    });
+
+    if (!existingProduct) {
+      throw new NotFoundException("Product Doesn't Exits");
+    }
+
+    // Product only changed by seller who added it
+    if (existingProduct?.sellerId !== userId) {
+      throw new UnauthorizedException(
+        'You have not permissiong to change this product',
+      );
+    }
     await this.prisma.product.delete({
       where: { id },
     });
