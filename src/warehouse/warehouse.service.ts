@@ -20,6 +20,7 @@ export class WarehouseService {
     // sent response
     return {
       success: true,
+      message: 'warehouse Created',
       warehouse,
     };
   }
@@ -59,6 +60,7 @@ export class WarehouseService {
     // return response
     return {
       success: true,
+      message: 'Product Added To Warehouse',
       warehouseStock,
     };
   }
@@ -110,6 +112,7 @@ export class WarehouseService {
     });
     return {
       success: true,
+      message: 'warehouse Updated',
       warehouse,
     };
   }
@@ -120,6 +123,7 @@ export class WarehouseService {
     });
     return {
       success: true,
+      message: 'Warehouse Removed',
     };
   }
 
@@ -141,6 +145,7 @@ export class WarehouseService {
     // return response
     return {
       success: true,
+      message: `${warehouse.name} at ${warehouse.city} selected`,
       user,
     };
   }

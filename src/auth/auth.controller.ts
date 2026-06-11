@@ -35,6 +35,7 @@ export class AuthController {
     }
     return {
       success: true,
+      message: 'Login Successfully',
     };
   }
 
@@ -46,6 +47,7 @@ export class AuthController {
 
     return {
       success: true,
+      message: 'Logout successfully',
     };
   }
 }

@@ -43,6 +43,7 @@ export class ProductService {
     // return response
     return {
       success: true,
+      message: 'Product Created',
       product,
     };
   }
@@ -91,11 +92,15 @@ export class ProductService {
       throw new UnauthorizedException('You are Not Authorize');
     }
 
-    // Product only changed by seller who added it
     const existingProduct = await this.prisma.product.findUnique({
       where: { id },
     });
 
+    if (!existingProduct) {
+      throw new BadRequestException("Product Doesn't Exits");
+    }
+
+    // Product only changed by seller who added it
     if (existingProduct?.sellerId !== userId) {
       throw new UnauthorizedException(
         'You have not permissiong to change this product',
@@ -108,6 +113,7 @@ export class ProductService {
     });
     return {
       success: true,
+      message: 'Product Updated Successfully',
       product,
     };
   }
@@ -118,6 +124,7 @@ export class ProductService {
     });
     return {
       success: true,
+      message: 'Product Deleted Successfuly',
     };
   }
 }

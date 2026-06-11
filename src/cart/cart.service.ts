@@ -81,6 +81,7 @@ export class CartService {
     // return res
     return {
       success: true,
+      message: 'product added to Cart',
       cartProduct,
     };
   }

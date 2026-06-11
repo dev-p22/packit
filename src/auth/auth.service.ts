@@ -27,7 +27,11 @@ export class AuthService {
     });
 
     // return response
-    return user;
+    return {
+      success: true,
+      message: 'User Created Successfully',
+      user,
+    };
   }
 
   async login(loginData: LoginDto) {
