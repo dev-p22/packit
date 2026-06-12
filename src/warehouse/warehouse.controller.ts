@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { WarehouseService } from './warehouse.service';
 import { CreateWarehouseDto } from './dto/create-warehouse.dto';
@@ -37,8 +38,8 @@ export class WarehouseController {
   }
 
   @Get()
-  findAll() {
-    return this.warehouseService.findAll();
+  findAll(@Query('city') city: string) {
+    return this.warehouseService.findAll(city);
   }
 
   @Get('/:warehouseId')

@@ -4,3 +4,8 @@ export interface AuthRequest extends Request {
     role: string;
   };
 }
+
+export enum sortByPriceEnum {
+  asc = 'asc',
+  desc = 'desc',
+}

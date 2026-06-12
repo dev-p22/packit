@@ -6,6 +6,7 @@ import {
   Param,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -31,8 +32,8 @@ export class OrderController {
   }
 
   @Get('/all')
-  findAll(@Req() req: AuthRequest) {
-    return this.orderService.findAll(req.user.userId);
+  findAll(@Req() req: AuthRequest, @Query('sortBy') sortBy: string) {
+    return this.orderService.findAll(req.user.userId, sortBy);
   }
 
   @Get(':orderId')

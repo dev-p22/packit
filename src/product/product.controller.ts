@@ -8,12 +8,17 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import type { AuthRequest } from 'src/common/interfaces/interface';
+import type {
+  AuthRequest,
+  sortByPriceEnum,
+} from 'src/common/interfaces/interface';
+import { Category } from 'generated/prisma/enums';
 
 @Controller('product')
 @UseGuards(JwtAuthGuard)
@@ -30,15 +35,23 @@ export class ProductController {
   }
 
   @Get()
-  async findAll() {
-    return this.productService.findAll();
+  async findAll(
+    @Query('name') name: string,
+    @Query('category') category: Category,
+    @Query('sortByPrice') sortByPrice: sortByPriceEnum,
+  ) {
+    return this.productService.findAll(name, category, sortByPrice);
   }
 
   @Get('/seller')
-  async findAllProductBySeller(@Req() req: AuthRequest) {
+  async findAllProductBySeller(
+    @Req() req: AuthRequest,
+    @Query('name') name: string,
+  ) {
     return this.productService.findAllProductOfSeller(
       req.user?.userId,
       req.user?.role,
+      name,
     );
   }
 

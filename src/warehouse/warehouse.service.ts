@@ -82,8 +82,19 @@ export class WarehouseService {
     };
   }
 
-  async findAll() {
-    const warehouses = await this.prisma.warehouse.findMany();
+  async findAll(city: string) {
+    const warehouses = await this.prisma.warehouse.findMany({
+      where: {
+        city: {
+          contains: city,
+          mode: 'insensitive',
+        },
+      },
+    });
+
+    if (warehouses.length == 0) {
+      throw new NotFoundException('Not Found');
+    }
     return {
       success: true,
       warehouses,

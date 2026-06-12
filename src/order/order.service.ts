@@ -8,7 +8,6 @@ import {
 import { CreateOrderDto } from './dto/create-order.dto';
 import { PrismaService } from 'src/prisma.service';
 import { isUuid } from 'src/common/helpers/isUuid';
-import { throwIfEmpty } from 'rxjs';
 
 @Injectable()
 export class OrderService {
@@ -108,7 +107,7 @@ export class OrderService {
     };
   }
 
-  async findAll(userId: string) {
+  async findAll(userId: string, sortBy: string) {
     const orders = await this.prisma.order.findMany({
       where: { userId },
       include: {
@@ -118,7 +117,14 @@ export class OrderService {
           },
         },
       },
+      orderBy: {
+        createdAt: sortBy === 'asc' ? 'asc' : 'desc',
+      },
     });
+
+    if (orders.length == 0) {
+      return { message: 'No Ordered Done' };
+    }
     return {
       success: true,
       orders,

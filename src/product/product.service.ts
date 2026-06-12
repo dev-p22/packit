@@ -8,8 +8,9 @@ import {
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma.service';
-import { Product } from 'generated/prisma/client';
+import { Category, Product } from 'generated/prisma/client';
 import { isUuid } from 'src/common/helpers/isUuid';
+import { sortByPriceEnum } from 'src/common/interfaces/interface';
 
 @Injectable()
 export class ProductService {
@@ -55,9 +56,25 @@ export class ProductService {
     };
   }
 
-  async findAll() {
-    const products = await this.prisma.product.findMany();
-    if (!products) {
+  async findAll(
+    name: string,
+    category: Category,
+    sortByPrice: sortByPriceEnum,
+  ) {
+    const products = await this.prisma.product.findMany({
+      where: {
+        name: {
+          contains: name,
+          mode: 'insensitive',
+        },
+        category: category,
+      },
+      orderBy: {
+        price: sortByPrice == sortByPriceEnum.asc ? 'asc' : 'desc',
+      },
+    });
+
+    if (products.length == 0) {
       throw new NotFoundException('Products Not Found');
     }
     return {
@@ -83,13 +100,19 @@ export class ProductService {
     };
   }
 
-  async findAllProductOfSeller(userId: string, role: string) {
+  async findAllProductOfSeller(userId: string, role: string, name: string) {
     if (role !== 'SELLER') {
       throw new UnauthorizedException('You are not Authorize');
     }
 
     const products = await this.prisma.product.findMany({
-      where: { sellerId: userId },
+      where: {
+        sellerId: userId,
+        name: {
+          contains: name,
+          mode: 'insensitive',
+        },
+      },
     });
 
     if (!products) {
