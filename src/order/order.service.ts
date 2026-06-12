@@ -1,12 +1,14 @@
 import {
   BadRequestException,
   Injectable,
+  NotAcceptableException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { PrismaService } from 'src/prisma.service';
 import { isUuid } from 'src/common/helpers/isUuid';
+import { throwIfEmpty } from 'rxjs';
 
 @Injectable()
 export class OrderService {
@@ -42,6 +44,9 @@ export class OrderService {
       throw new NotFoundException('Cart Not Found');
     }
 
+    if (cart.userCarts.length == 0) {
+      throw new BadRequestException('Cart Is Empty');
+    }
     if (cart.userId !== userId) {
       throw new UnauthorizedException('You are not Authorize for this action');
     }
@@ -56,6 +61,17 @@ export class OrderService {
 
     await Promise.all(
       cart?.userCarts.map(async (item) => {
+        const productId = item.productId;
+        const warehouseStocks = await this.prisma.warehouseStocks.findUnique({
+          where: { productId_warehouseId: { productId, warehouseId } },
+        });
+
+        if (warehouseStocks && warehouseStocks?.quantity <= 0) {
+          throw new NotAcceptableException(
+            `${item.product.name} got Out Of Stocks`,
+          );
+        }
+
         await this.prisma.orderedProduct.create({
           data: {
             name: item.product.name,
@@ -66,8 +82,6 @@ export class OrderService {
             quantity: item.quantity,
           },
         });
-
-        const productId = item.productId;
 
         // remove stocks from warehouse
         await this.prisma.warehouseStocks.update({
