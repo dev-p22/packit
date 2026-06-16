@@ -7,9 +7,10 @@ import { ProductModule } from './product/product.module';
 import { WarehouseModule } from './warehouse/warehouse.module';
 import { CartModule } from './cart/cart.module';
 import { OrderModule } from './order/order.module';
+import { AiSuggestitonModule } from './ai-suggestiton/ai-suggestiton.module';
 
 @Module({
-  imports: [AuthModule, ConfigModule.forRoot(), ProductModule, WarehouseModule, CartModule, OrderModule],
+  imports: [AuthModule, ConfigModule.forRoot(), ProductModule, WarehouseModule, CartModule, OrderModule, AiSuggestitonModule],
   controllers: [AppController],
   providers: [AppService],
 })

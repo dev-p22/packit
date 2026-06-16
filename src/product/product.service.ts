@@ -9,8 +9,8 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma.service';
 import { Category, Product } from 'generated/prisma/client';
-import { isUuid } from 'src/common/helpers/isUuid';
 import { sortByPriceEnum } from 'src/common/interfaces/interface';
+import { isUuid } from 'src/common/helpers/isUuid';
 
 @Injectable()
 export class ProductService {
@@ -87,7 +87,7 @@ export class ProductService {
     if (!isUuid(id)) {
       throw new BadRequestException('ProductId is not Valid');
     }
-    const product: Product | null = await this.prisma.product.findUnique({
+    const product = await this.prisma.product.findUnique({
       where: { id },
     });
 

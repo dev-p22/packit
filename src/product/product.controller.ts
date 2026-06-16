@@ -13,12 +13,12 @@ import {
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { Category } from 'generated/prisma/enums';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import type {
   AuthRequest,
   sortByPriceEnum,
 } from 'src/common/interfaces/interface';
-import { Category } from 'generated/prisma/enums';
 
 @Controller('product')
 @UseGuards(JwtAuthGuard)

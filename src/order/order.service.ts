@@ -147,6 +147,10 @@ export class OrderService {
         },
       },
     });
+
+    if (!order) {
+      throw new NotFoundException('Order Not found');
+    }
     return {
       success: true,
       order,

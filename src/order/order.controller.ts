@@ -10,8 +10,8 @@ import {
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import type { AuthRequest } from 'src/common/interfaces/interface';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import type { AuthRequest } from 'src/common/interfaces/interface';
 
 @Controller('warehouse/:warehouseId/order')
 @UseGuards(JwtAuthGuard)

@@ -6,11 +6,12 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { RegisterDto } from 'src/auth/dto/Register.dto';
+
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/Login.dto';
 import type { Response } from 'express';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { RegisterDto } from './dto/Register.dto';
 
 @Controller('auth')
 export class AuthController {

@@ -155,6 +155,14 @@ export class WarehouseService {
     if (!isUuid(id)) {
       throw new BadRequestException('warehouseId is not Valid');
     }
+
+    const warehouse = await this.prisma.warehouse.findUnique({
+      where: { id },
+    });
+    if (!warehouse) {
+      throw new NotFoundException('Warehouse Not found');
+    }
+
     await this.prisma.warehouse.delete({
       where: { id },
     });

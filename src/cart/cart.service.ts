@@ -6,30 +6,24 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { User } from 'generated/prisma/client';
 import { isUuid } from 'src/common/helpers/isUuid';
+
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class CartService {
   constructor(private prisma: PrismaService) {}
 
-  async createCart(userId: string) {
-    // validate
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      throw new BadRequestException("User Doesn't Exits");
-    }
-    // create cart
+  // this will run for Create cart but in addToCart service function not from client side
+  async createCart(userId: string, user: User) {
     const cart = await this.prisma.cart.create({
       data: {
         userId,
         warehouseId: user.warehouseId as string,
       },
     });
-    // return response∏∏
+    // return cart
     return cart;
   }
 
@@ -51,7 +45,7 @@ export class CartService {
     });
 
     if (!cart) {
-      cart = await this.createCart(userId);
+      cart = await this.createCart(userId, user);
     }
 
     if (userId !== cart?.userId) {
